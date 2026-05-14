@@ -22,15 +22,15 @@
             cursor: url('normal.png'), auto;
         }
 
-        a, button, .link-btn, .bg-switch-btn, 
+        a, button, .link-btn, .bg-switch-btn, .matrix-switch-btn,
         .avatar-wrapper, .avatar-wrapper *,
         .link-btn span, .link-btn img,
-        .bg-switch-btn img,
-        #avatarClicker, #avatarImg {
+        .bg-switch-btn img, .matrix-switch-btn img,
+        #avatarClicker, #avatarImg, .tab-button, .project-btn {
             cursor: url('hand.png'), pointer !important;
         }
         
-        .link-btn span {
+        .link-btn span, .project-btn span {
             cursor: url('hand.png'), pointer !important;
         }
 
@@ -100,6 +100,72 @@
             transition: all 0.3s ease;
         }
 
+        .tabs-container {
+            position: relative;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 1.8rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 60px;
+            padding: 4px;
+        }
+
+        .tab-button {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+            border: none;
+            font-family: 'CustomFont', 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.2s ease;
+            letter-spacing: 0.5px;
+            cursor: url('hand.png'), pointer;
+        }
+
+        .tab-button.active {
+            color: white;
+        }
+
+        .tab-slider {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+            border-radius: 40px;
+            transition: left 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1), width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            z-index: 1;
+        }
+
+        .tab-content {
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .tab-content.hidden {
+            display: none;
+        }
+
+        .tab-content:not(.hidden) {
+            display: block;
+            animation: fadeSlideIn 0.3s ease;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .avatar-wrapper {
             width: 110px;
             height: 110px;
@@ -153,26 +219,31 @@
         }
 
         .link-btn {
-            background: rgba(30, 32, 44, 0.8);
+            background: rgba(30, 32, 44, 0.85) !important;
             backdrop-filter: blur(8px);
             padding: 10px 8px;
             border-radius: 60px;
             text-decoration: none;
             font-weight: 600;
             font-size: 0.85rem;
-            color: #f0f0ff;
+            color: #f0f0ff !important;
             transition: transform 0.18s ease, background 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'CustomFont', 'Inter', sans-serif;
         }
-
+        
+        .link-btn:visited {
+            color: #f0f0ff !important;
+        }
+        
         .link-btn:hover {
             transform: scale(1.04);
-            background: rgba(55, 58, 85, 0.9);
-            color: white;
+            background: rgba(55, 58, 85, 0.95) !important;
+            color: white !important;
             border-color: rgba(255, 255, 255, 0.3);
         }
 
@@ -184,7 +255,49 @@
             pointer-events: none;
         }
         
-        .link-btn span {
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-top: 8px;
+        }
+
+        .project-btn {
+            background: rgba(30, 32, 44, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 12px 8px;
+            border-radius: 60px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #f0f0ff;
+            transition: transform 0.18s ease, background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'CustomFont', 'Inter', sans-serif;
+        }
+        
+        .project-btn:visited {
+            color: #f0f0ff;
+        }
+
+        .project-btn:hover {
+            transform: scale(1.04);
+            background: rgba(55, 58, 85, 0.95);
+            color: white;
+        }
+
+        .project-icon {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            pointer-events: none;
+        }
+        
+        .link-btn span, .project-btn span {
             pointer-events: none;
         }
 
@@ -197,10 +310,9 @@
             text-align: center;
         }
 
-        .bg-switch-btn {
+        .bg-switch-btn, .matrix-switch-btn {
             position: fixed;
             bottom: 28px;
-            right: 28px;
             z-index: 20;
             background: rgba(20, 22, 32, 0.75);
             backdrop-filter: blur(8px);
@@ -217,7 +329,15 @@
             padding: 0;
         }
         
-        .bg-switch-btn img {
+        .bg-switch-btn {
+            right: 28px;
+        }
+
+        .matrix-switch-btn {
+            left: 28px;
+        }
+        
+        .bg-switch-btn img, .matrix-switch-btn img {
             width: 32px;
             height: 32px;
             object-fit: contain;
@@ -225,7 +345,7 @@
             pointer-events: none;
         }
 
-        .bg-switch-btn:hover {
+        .bg-switch-btn:hover, .matrix-switch-btn:hover {
             transform: scale(1.08);
             background: rgba(45, 48, 68, 0.9);
         }
@@ -236,192 +356,87 @@
                 align-items: flex-start;
                 padding-top: 5vh;
             }
-            
             .glass-card {
                 width: 95%;
                 max-width: 420px;
                 padding: 1.2rem 1.2rem 1rem;
-                margin: 0 auto;
                 border-radius: 36px;
             }
-            
             .avatar-wrapper {
                 width: 85px;
                 height: 85px;
-                margin-bottom: 0.7rem;
             }
-            
             .nickname {
                 font-size: 1.5rem;
-                margin-bottom: 0.3rem;
             }
-            
             .description {
                 font-size: 0.8rem;
-                padding: 0.3rem 0.9rem;
-                margin-bottom: 1rem;
             }
-            
-            .links {
+            .links, .projects-grid {
                 gap: 10px;
-                margin-top: 6px;
             }
-            
-            .link-btn {
+            .link-btn, .project-btn {
                 padding: 9px 6px;
                 font-size: 0.75rem;
-                gap: 6px;
             }
-            
-            .link-icon {
-                width: 18px;
-                height: 18px;
-            }
-            
-            .version-text {
-                margin-top: 18px;
-                font-size: 0.65rem;
-            }
-            
-            .bg-switch-btn {
-                bottom: 20px;
-                right: 20px;
+            .bg-switch-btn, .matrix-switch-btn {
                 width: 48px;
                 height: 48px;
+                bottom: 20px;
             }
-            
-            .bg-switch-btn img {
-                width: 28px;
-                height: 28px;
-            }
+            .bg-switch-btn { right: 20px; }
+            .matrix-switch-btn { left: 20px; }
         }
-        
+
         @media (max-width: 480px) and (orientation: portrait) {
-            body {
-                padding-top: 4vh;
+            .links, .projects-grid {
+                grid-template-columns: 1fr;
             }
-            
-            .glass-card {
-                padding: 1rem 1rem 0.9rem;
-                border-radius: 32px;
-            }
-            
             .avatar-wrapper {
                 width: 75px;
                 height: 75px;
             }
-            
-            .nickname {
-                font-size: 1.3rem;
-            }
-            
-            .description {
-                font-size: 0.7rem;
-                padding: 0.25rem 0.8rem;
-            }
-            
-            .links {
-                gap: 8px;
-                grid-template-columns: 1fr; 
-            }
-            
-            .link-btn {
-                padding: 10px 8px;
-                font-size: 0.8rem;
-            }
-            
-            .version-text {
-                margin-top: 16px;
-            }
-        }
-        
-        @media (max-width: 900px) and (orientation: landscape) {
-            body {
-                padding: 10px;
-                align-items: center;
-            }
-            
-            .glass-card {
-                padding: 1rem 1.5rem 0.8rem;
-                max-width: 85%;
-                margin: 0 auto;
-            }
-            
-            .avatar-wrapper {
-                width: 70px;
-                height: 70px;
-                margin-bottom: 0.5rem;
-            }
-            
-            .nickname {
-                font-size: 1.3rem;
-            }
-            
-            .description {
-                font-size: 0.75rem;
-                margin-bottom: 0.8rem;
-            }
-            
-            .links {
-                gap: 8px;
-            }
-            
-            .link-btn {
-                padding: 7px 5px;
-                font-size: 0.7rem;
-            }
-            
-            .bg-switch-btn {
-                bottom: 15px;
-                right: 15px;
-                width: 42px;
-                height: 42px;
-            }
-            
-            .bg-switch-btn img {
-                width: 24px;
-                height: 24px;
-            }
-        }
-        
-        @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-            .glass-card {
-                max-width: 480px;
-                padding: 1.6rem 2rem 1.2rem;
-            }
-            
-            .avatar-wrapper {
-                width: 100px;
-                height: 100px;
-            }
-            
-            .nickname {
-                font-size: 1.8rem;
-            }
         }
         
         @media (hover: none) and (pointer: coarse) {
-            .link-btn:hover {
+            .link-btn:hover, .project-btn:hover, .bg-switch-btn:hover, .matrix-switch-btn:hover {
                 transform: none;
             }
-            .avatar-wrapper:hover {
-                transform: none;
-            }
-            .bg-switch-btn:hover {
-                transform: none;
-            }
-            
-            .link-btn:active {
+            .link-btn:active, .project-btn:active {
                 transform: scale(0.97);
-                background: rgba(55, 58, 85, 0.9);
-            }
-            .avatar-wrapper:active {
-                transform: scale(0.98);
-            }
-            .bg-switch-btn:active {
-                transform: scale(0.96);
             }
         }
+		
+.nickname {
+    background: linear-gradient(135deg, #FFFFFF 0%, #C0C4FF 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent !important;
+    display: inline-block;
+    width: auto;
+}
+
+@supports not (background-clip: text) {
+    .nickname {
+        color: #ffffff !important;
+        background: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .nickname {
+        -webkit-text-fill-color: transparent;
+        background: linear-gradient(135deg, #FFFFFF 0%, #C0C4FF 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+    }
+    
+    .glass-card {
+        background: rgba(20, 22, 32, 0.85) !important;
+        backdrop-filter: blur(12px) !important;
+    }
+}
+		
     </style>
 </head>
 <body>
@@ -432,12 +447,25 @@
     <canvas id="rainCanvas"></canvas>
 
     <div class="glass-card">
-        <div class="avatar-wrapper" id="avatarClicker">
-            <img id="avatarImg" class="avatar" src="avatar.png" alt="avatar">
+        <div class="tabs-container" id="tabsContainer">
+            <div class="tab-slider" id="tabSlider"></div>
+            <button class="tab-button active" data-tab="profile">Profile</button>
+            <button class="tab-button" data-tab="projects">My projects</button>
         </div>
-        <div class="nickname" id="nicknameText">nickname</div>
-        <div class="description" id="descriptionText">Description</div>
-        <div class="links" id="linksContainer"></div>
+
+        <div id="profile-tab" class="tab-content">
+            <div class="avatar-wrapper" id="avatarClicker">
+                <img id="avatarImg" class="avatar" src="avatar.png" alt="avatar">
+            </div>
+            <div class="nickname" id="nicknameText">nickname</div>
+            <div class="description" id="descriptionText">Description</div>
+            <div class="links" id="linksContainer"></div>
+        </div>
+
+        <div id="projects-tab" class="tab-content hidden">
+            <div class="projects-grid" id="projectsContainer"></div>
+        </div>
+
         <div class="version-text" id="versionText">1.0 (May 2026)</div>
     </div>
 
@@ -445,12 +473,15 @@
         <img src="refresh.png" alt="switch" id="switchIcon" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M23 4v6h-6%22/%3E%3Cpath d=%22M1 20v-6h6%22/%3E%3Cpath d=%22M3.51 9a9 9 0 0 1 14.85-3.36L23 10%22/%3E%3Cpath d=%22M20.49 15a9 9 0 0 1-14.85 3.36L1 14%22/%3E%3C/svg%3E'">
     </button>
 
+    <button class="matrix-switch-btn" id="matrixSwitchBtn">
+        <img src="drop.png" alt="raindrop" id="matrixIcon" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222%22%3E%3Cpath d=%22M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%223%22/%3E%3C/svg%3E'">
+    </button>
+
     <script>
-        userProfile = {
+        const      userProfile = {
             nickname: "xetrov",
             description: "Indie game developer from East Europe, rookie 2D/3D designer, Vortex Group owner.",
-            faviconUrl: "https://cdn-icons-png.flaticon.com/512/10337/10337609.png",
-            version: "Version 1.0 (May 2026)",
+            version: "Version 1.1 (May 2026)",
             socialLinks: [
                 { text: "Telegram (Personal channel)", url: "https://t.me/xetrovqq", icon: "tg.png" },
                 { text: "Telegram (Vortex Group channel)", url: "https://t.me/vortexgroupdev", icon: "tg.png" },
@@ -463,14 +494,157 @@
             ]
         };
 
+        const projectsData = [
+            { text: "IsoCrypt (Game)", url: "https://xetrovqq.itch.io/isocrypt", icon: "ic.png" },
+            { text: "Evil Abyss (Game)", url: "https://xetrovqq.itch.io/evil-abyss", icon: "ea.png" },
+            { text: "The Cave Curse (Game)", url: "https://xetrovqq.itch.io/the-cave-curse", icon: "tcc.png" },
+            { text: "Drones VS Drunks (Game)", url: "https://xetrovqq.itch.io/drones-vs-drunks", icon: "dvd.png" },
+            { text: "ASCII-art generator (App)", url: "https://drive.google.com/file/d/1Mdu9zcCaxqtypYvoCmoxRAAwJnVCuq3u/view?usp=sharing", icon: "aag.png" },
+            { text: "Vortex Macro (App)", url: "https://drive.google.com/file/d/1-Qvg_mKU9yEzh05N_B5Sgsf4cXeTN-BD/view?usp=sharing", icon: "vm.png" }
+        ];
+
+        const matrixConfig = {
+    fontSize: 22,              
+    symbolCount: 150,           
+    speedMin: 0.8,            
+    speedMax: 2.2,             
+    color: "#0f0",             
+    bgColor: "rgba(0,0,0,0.05)", 
+    fadeHeight: 0.6,         
+    maxFallHeight: 0.45,     
+    minFallHeight: 0.25,      
+    opacityStart: 0.9,         
+    opacityEnd: 0.05,         
+    updateInterval: 1,       
+    symbols: "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+};
+
         const rainColors = [
             "rgba(100, 150, 255, 0.65)",
             "rgba(180, 100, 255, 0.65)",
             "rgba(255, 80, 100, 0.65)"
         ];
 
-        let currentRainColorIndex = 0;
-        
+        let currentBgIndex = 0;
+        let isMatrixMode = false;
+        let rainDrops = [];
+        let matrixDrops = [];
+        let animationId = null;
+        let canvas, ctx, canvasWidth, canvasHeight;
+        let audioCtx = null;
+        let currentAnimationLoop = null;
+
+        const bgElements = [document.getElementById("bg1"), document.getElementById("bg2"), document.getElementById("bg3")];
+        const nicknameEl = document.getElementById("nicknameText");
+        const descriptionEl = document.getElementById("descriptionText");
+        const linksContainer = document.getElementById("linksContainer");
+        const projectsContainer = document.getElementById("projectsContainer");
+        const avatarImg = document.getElementById("avatarImg");
+        const switchBgBtn = document.getElementById("switchBgBtn");
+        const matrixSwitchBtn = document.getElementById("matrixSwitchBtn");
+        const versionEl = document.getElementById("versionText");
+        const matrixIcon = document.getElementById("matrixIcon");
+
+        let currentAvatarIndex = 0;
+        const avatarArray = ["avatar.png", "avatar2.png", "avatar3.png", "avatar4.png"];
+        let titleInterval = null;
+
+        function playClickSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = 880;
+                gain.gain.value = 0.12;
+                osc.type = "sine";
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
+                osc.stop(audioCtx.currentTime + 0.2);
+            } catch(e) {}
+        }
+
+        function playTabSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = 660;
+                gain.gain.value = 0.1;
+                osc.type = "sine";
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.15);
+                osc.stop(audioCtx.currentTime + 0.15);
+            } catch(e) {}
+        }
+
+        function loadProfileData() {
+            nicknameEl.innerText = userProfile.nickname;
+            descriptionEl.innerText = userProfile.description;
+            versionEl.innerText = userProfile.version;
+            document.title = `[${userProfile.nickname}]`;
+            
+            linksContainer.innerHTML = "";
+            userProfile.socialLinks.forEach(link => {
+                const a = document.createElement("a");
+                a.href = link.url;
+                a.target = "_blank";
+                a.className = "link-btn";
+                const iconImg = document.createElement("img");
+                iconImg.src = link.icon;
+                iconImg.className = "link-icon";
+                iconImg.onerror = function() { this.style.display = "none"; };
+                const span = document.createElement("span");
+                span.innerText = link.text;
+                a.appendChild(iconImg);
+                a.appendChild(span);
+                a.addEventListener("click", () => playClickSound());
+                linksContainer.appendChild(a);
+            });
+
+            projectsContainer.innerHTML = "";
+            projectsData.forEach(proj => {
+                const a = document.createElement("a");
+                a.href = proj.url;
+                a.target = "_blank";
+                a.className = "project-btn";
+                const iconImg = document.createElement("img");
+                iconImg.src = proj.icon;
+                iconImg.className = "project-icon";
+                iconImg.onerror = function() { this.style.display = "none"; };
+                const span = document.createElement("span");
+                span.innerText = proj.text;
+                a.appendChild(iconImg);
+                a.appendChild(span);
+                a.addEventListener("click", () => playClickSound());
+                projectsContainer.appendChild(a);
+            });
+        }
+
+        function initAvatar() {
+            if (avatarArray.length) avatarImg.src = avatarArray[0];
+        }
+
+        function nextAvatar() {
+            currentAvatarIndex = (currentAvatarIndex + 1) % avatarArray.length;
+            avatarImg.src = avatarArray[currentAvatarIndex];
+            playClickSound();
+        }
+
+        function cycleBackground() {
+            currentBgIndex = (currentBgIndex + 1) % bgElements.length;
+            for (let i = 0; i < bgElements.length; i++) {
+                bgElements[i].style.opacity = i === currentBgIndex ? "1" : "0";
+            }
+            if (!isMatrixMode && window.rainConfig) {
+                window.rainConfig.color = rainColors[currentBgIndex];
+            }
+            playClickSound();
+        }
+
         const rainConfig = {
             count: 200,
             color: rainColors[0],
@@ -480,206 +654,8 @@
             speedMax: 4.5,
             width: 1.2
         };
+        window.rainConfig = rainConfig;
 
-        const titleAnimConfig = {
-            speed: 160,
-        };
-
-        const avatarArray = [
-            "avatar.png",
-			"avatar1.png",
-            "avatar2.png",
-            "avatar3.png",
-            "avatar4.png"
-        ];
-
-        let currentBgIndex = 0;
-        const bgElements = [
-            document.getElementById("bg1"),
-            document.getElementById("bg2"),
-            document.getElementById("bg3")
-        ];
-        
-        let audioCtx = null;
-        
-        function playClickSound() {
-            try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                oscillator.frequency.value = 880;
-                gainNode.gain.value = 0.15;
-                oscillator.type = "sine";
-                oscillator.start();
-                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
-                oscillator.stop(audioCtx.currentTime + 0.2);
-            } catch(e) { console.log("audio error", e); }
-        }
-        
-        function playAvatarSound() {
-            try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                oscillator.frequency.value = 660;
-                gainNode.gain.value = 0.2;
-                oscillator.type = "triangle";
-                oscillator.start();
-                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.15);
-                oscillator.stop(audioCtx.currentTime + 0.15);
-            } catch(e) {}
-        }
-
-        const nicknameEl = document.getElementById("nicknameText");
-        const descriptionEl = document.getElementById("descriptionText");
-        const linksContainer = document.getElementById("linksContainer");
-        const avatarImg = document.getElementById("avatarImg");
-        const switchBtn = document.getElementById("switchBgBtn");
-        const versionEl = document.getElementById("versionText");
-
-        let currentAvatarIndex = 0;
-        let titleInterval = null;
-        let titleNick = "";
-        
-        let canvas, ctx, rainDrops = [], animationId = null, canvasWidth, canvasHeight;
-        
-        function getBracketedNick() {
-            return `[${userProfile.nickname}]`;
-        }
-
-        function loadProfileData() {
-            nicknameEl.innerText = userProfile.nickname;
-            descriptionEl.innerText = userProfile.description;
-            versionEl.innerText = userProfile.version;
-            titleNick = getBracketedNick();
-            document.title = titleNick;
-            
-             linksContainer.innerHTML = "";
-    userProfile.socialLinks.forEach(link => {
-        const a = document.createElement("a");
-        a.href = link.url;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.className = "link-btn";
-        const iconImg = document.createElement("img");
-        iconImg.src = link.icon;
-        iconImg.alt = "icon";
-        iconImg.className = "link-icon";
-        iconImg.onerror = function() {
-            this.style.display = "none";
-        };
-        const spanText = document.createElement("span");
-        spanText.innerText = link.text;
-        a.appendChild(iconImg);
-        a.appendChild(spanText);
-        
-        a.addEventListener("click", (e) => {
-            playClickSound();
-        });
-        
-        linksContainer.appendChild(a);
-    });
-}
-        
-        function initAvatar() {
-            if (avatarArray.length) {
-                avatarImg.src = avatarArray[0];
-                currentAvatarIndex = 0;
-            }
-        }
-        
-        function nextAvatar() {
-            if (!avatarArray.length) return;
-            currentAvatarIndex = (currentAvatarIndex + 1) % avatarArray.length;
-            avatarImg.src = avatarArray[currentAvatarIndex];
-            playAvatarSound();
-        }
-        
-        function updateRainColorForBackground(bgIndex) {
-            if (bgIndex >= 0 && bgIndex < rainColors.length) {
-                rainConfig.color = rainColors[bgIndex];
-                currentRainColorIndex = bgIndex;
-            }
-        }
-        
-        function cycleBackground() {
-            currentBgIndex = (currentBgIndex + 1) % bgElements.length;
-            for (let i = 0; i < bgElements.length; i++) {
-                if (i === currentBgIndex) {
-                    bgElements[i].style.opacity = "1";
-                } else {
-                    bgElements[i].style.opacity = "0";
-                }
-            }
-            updateRainColorForBackground(currentBgIndex);
-            playClickSound();
-        }
-        
-        function ensureBackgroundsWork() {
-            for (let i = 0; i < bgElements.length; i++) {
-                let bgEl = bgElements[i];
-                let currentBgImage = getComputedStyle(bgEl).backgroundImage;
-                if (currentBgImage === 'none' || currentBgImage === '') {
-                    if (i === 0) bgEl.style.backgroundImage = "url('background.png')";
-                    else if (i === 1) bgEl.style.backgroundImage = "url('background2.gif')";
-                    else if (i === 2) bgEl.style.backgroundImage = "url('background3.gif')";
-                }
-            }
-        }
-        
-        function startTitleAnimation() {
-            if (titleInterval) clearInterval(titleInterval);
-            const fullBracketed = getBracketedNick();
-            const len = fullBracketed.length;
-            if (len === 0) return;
-            
-            let step = 0;
-            let direction = 1;
-            
-            function updateTitle() {
-                if (direction === 1) {
-                    if (step <= len) {
-                        const displayPart = fullBracketed.substring(0, step);
-                        document.title = displayPart;
-                        step++;
-                        if (step > len) {
-                            step = len - 1;
-                            direction = -1;
-                        }
-                    }
-                } else {
-                    if (step >= 0) {
-                        const displayPart = fullBracketed.substring(0, step);
-                        document.title = displayPart;
-                        step--;
-                        if (step < 0) {
-                            step = 1;
-                            direction = 1;
-                        }
-                    }
-                }
-            }
-            titleInterval = setInterval(updateTitle, titleAnimConfig.speed);
-        }
-        
-        canvas = document.getElementById("rainCanvas");
-        ctx = canvas.getContext("2d");
-        
-        function resizeCanvas() {
-            canvasWidth = window.innerWidth;
-            canvasHeight = window.innerHeight;
-            canvas.width = canvasWidth;
-            canvas.height = canvasHeight;
-        }
-        
         class RainDrop {
             constructor() {
                 this.x = Math.random() * canvasWidth;
@@ -696,89 +672,261 @@
                 }
             }
             draw() {
-                if (!ctx) return;
                 ctx.beginPath();
-                let strokeColor = rainConfig.color;
-                if (strokeColor.startsWith("rgba")) {
-                    let alphaVal = this.opacity * 0.85;
-                    strokeColor = strokeColor.replace(/[\d\.]+\)$/g, `${alphaVal})`);
-                    ctx.strokeStyle = strokeColor;
+                let color = rainConfig.color;
+                if (color.startsWith("rgba")) {
+                    let alpha = this.opacity * 0.85;
+                    color = color.replace(/[\d\.]+\)$/g, `${alpha})`);
                 } else {
                     ctx.globalAlpha = this.opacity * 0.8;
-                    ctx.strokeStyle = strokeColor;
                 }
+                ctx.strokeStyle = color;
                 ctx.lineWidth = rainConfig.width;
                 ctx.lineCap = "round";
                 ctx.moveTo(this.x, this.y);
                 ctx.lineTo(this.x, this.y + this.length);
                 ctx.stroke();
-                ctx.globalAlpha = 1.0;
+                ctx.globalAlpha = 1;
             }
         }
-        
+
+        class MatrixDrop {
+    constructor() {
+        this.reset();
+    }
+    reset() {
+        this.x = Math.random() * canvasWidth;
+        this.y = Math.random() * canvasHeight * 0.15;
+        this.speed = matrixConfig.speedMin + Math.random() * (matrixConfig.speedMax - matrixConfig.speedMin);
+        this.symbol = matrixConfig.symbols[Math.floor(Math.random() * matrixConfig.symbols.length)];
+        this.maxHeight = canvasHeight * (matrixConfig.minFallHeight + Math.random() * (matrixConfig.maxFallHeight - matrixConfig.minFallHeight));
+        this.startY = this.y;
+        this.opacityStart = matrixConfig.opacityStart;
+        this.opacityEnd = matrixConfig.opacityEnd;
+    }
+    update() {
+        this.y += this.speed;
+        let progress = (this.y - this.startY) / this.maxHeight;
+        if (progress >= 1 || this.y > this.startY + this.maxHeight) {
+            this.reset();
+        } else {
+            this.opacity = this.opacityStart * (1 - progress * (1 - this.opacityEnd / this.opacityStart));
+        }
+    }
+    draw() {
+        ctx.font = `${matrixConfig.fontSize}px 'CustomFont', monospace`;
+        ctx.fillStyle = matrixConfig.color;
+        ctx.globalAlpha = Math.max(0, Math.min(matrixConfig.opacityStart, this.opacity));
+        ctx.fillText(this.symbol, this.x, this.y);
+        ctx.globalAlpha = 1;
+    }
+}
+
         function initRain() {
             rainDrops = [];
-            for (let i = 0; i < rainConfig.count; i++) {
-                rainDrops.push(new RainDrop());
-            }
+            for (let i = 0; i < rainConfig.count; i++) rainDrops.push(new RainDrop());
         }
-        
+
         function drawRain() {
-            if (!ctx) return;
             ctx.clearRect(0, 0, canvasWidth, canvasHeight);
             for (let drop of rainDrops) drop.draw();
         }
-        
-        function updateRain() {
-            for (let drop of rainDrops) drop.update();
-            drawRain();
-            animationId = requestAnimationFrame(updateRain);
-        }
-        
-        function startRain() {
-            if (animationId) cancelAnimationFrame(animationId);
-            resizeCanvas();
-            initRain();
-            updateRain();
-        }
-        
-        window.addEventListener("resize", () => {
-            resizeCanvas();
-            initRain();
-        });
-        
-        function init() {
-            loadProfileData();
-            initAvatar();
-            startTitleAnimation();
-            startRain();
-            
-            const avatarWrapper = document.getElementById("avatarClicker");
-            avatarWrapper.addEventListener("click", nextAvatar);
-            switchBtn.addEventListener("click", cycleBackground);
-            
-            for (let i = 0; i < bgElements.length; i++) {
-                if (i === 0) bgElements[i].style.opacity = "1";
-                else bgElements[i].style.opacity = "0";
-            }
-            currentBgIndex = 0;
-            updateRainColorForBackground(0);
-            
-            ensureBackgroundsWork();
-            setInterval(ensureBackgroundsWork, 1500);
-            
-            function unlockAudio() {
-                if (audioCtx && audioCtx.state === 'suspended') {
-                    audioCtx.resume();
+
+        function updateRainAnimation() {
+            if (currentAnimationLoop) cancelAnimationFrame(currentAnimationLoop);
+            function loop() {
+                if (!isMatrixMode) {
+                    for (let drop of rainDrops) drop.update();
+                    drawRain();
                 }
-                document.removeEventListener('click', unlockAudio);
-                document.removeEventListener('touchstart', unlockAudio);
+                currentAnimationLoop = requestAnimationFrame(loop);
             }
-            document.addEventListener('click', unlockAudio);
-            document.addEventListener('touchstart', unlockAudio);
-            
-            console.log("qq! Loaded");
+            loop();
         }
+
+        function initMatrix() {
+    let count = matrixConfig.symbolCount;
+    if (!count || count < 10) {
+        count = Math.min(120, Math.floor(canvasWidth * canvasHeight / 2000));
+    }
+    matrixDrops = [];
+    for (let i = 0; i < count; i++) matrixDrops.push(new MatrixDrop());
+}
+
+        function drawMatrix() {
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            for (let drop of matrixDrops) drop.draw();
+        }
+
+        function updateMatrixAnimation() {
+            if (currentAnimationLoop) cancelAnimationFrame(currentAnimationLoop);
+            function loop() {
+                if (isMatrixMode) {
+                    for (let drop of matrixDrops) drop.update();
+                    drawMatrix();
+                }
+                currentAnimationLoop = requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        function switchEffectMode() {
+            isMatrixMode = !isMatrixMode;
+            
+            if (isMatrixMode) {
+                if (currentAnimationLoop) cancelAnimationFrame(currentAnimationLoop);
+                initMatrix();
+                updateMatrixAnimation();
+                matrixIcon.src = "code.png";
+                matrixIcon.onerror = function() { this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='%230f0' stroke-width='2'%3E%3Cpath d='M16 8l4 4-4 4M8 16l-4-4 4-4'/%3E%3C/svg%3E"; };
+            } else {
+                if (currentAnimationLoop) cancelAnimationFrame(currentAnimationLoop);
+                initRain();
+                updateRainAnimation();
+                matrixIcon.src = "drop.png";
+                matrixIcon.onerror = function() { this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E"; };
+            }
+            playClickSound();
+        }
+
+        function startTitleAnimation() {
+            if (titleInterval) clearInterval(titleInterval);
+            const full = `[${userProfile.nickname}]`;
+            let step = 0, direction = 1;
+            titleInterval = setInterval(() => {
+                if (direction === 1) {
+                    if (step <= full.length) {
+                        document.title = full.substring(0, step);
+                        step++;
+                        if (step > full.length) { step = full.length - 1; direction = -1; }
+                    }
+                } else {
+                    if (step >= 0) {
+                        document.title = full.substring(0, step);
+                        step--;
+                        if (step < 0) { step = 1; direction = 1; }
+                    }
+                }
+            }, 160);
+        }
+
+        function updateTabSlider(activeButton) {
+            const slider = document.getElementById('tabSlider');
+            const container = document.getElementById('tabsContainer');
+            const buttonRect = activeButton.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            slider.style.left = (buttonRect.left - containerRect.left) + 'px';
+            slider.style.width = buttonRect.width + 'px';
+        }
+
+        function initTabs() {
+            const profileTab = document.getElementById("profile-tab");
+            const projectsTab = document.getElementById("projects-tab");
+            const tabButtons = document.querySelectorAll(".tab-button");
+            const slider = document.getElementById('tabSlider');
+            
+            setTimeout(() => {
+                const activeButton = document.querySelector('.tab-button.active');
+                if (activeButton) updateTabSlider(activeButton);
+            }, 100);
+
+            tabButtons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const tabId = btn.getAttribute("data-tab");
+                    if (btn.classList.contains('active')) return;
+                    
+                    tabButtons.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    updateTabSlider(btn);
+                    
+                    if (tabId === "profile") {
+                        profileTab.classList.remove("hidden");
+                        projectsTab.classList.add("hidden");
+                    } else {
+                        profileTab.classList.add("hidden");
+                        projectsTab.classList.remove("hidden");
+                    }
+                    playTabSound();
+                });
+            });
+            
+            window.addEventListener('resize', () => {
+                const activeButton = document.querySelector('.tab-button.active');
+                if (activeButton) updateTabSlider(activeButton);
+            });
+        }
+
+        function resizeCanvas() {
+            canvasWidth = window.innerWidth;
+            canvasHeight = window.innerHeight;
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            if (!isMatrixMode) {
+                initRain();
+            } else {
+                initMatrix();
+            }
+        }
+
+        function init() {
+    canvas = document.getElementById("rainCanvas");
+    ctx = canvas.getContext("2d");
+    resizeCanvas();
+    window.addEventListener("resize", () => {
+        resizeCanvas();
+    });
+
+    loadProfileData();
+    initAvatar();
+    startTitleAnimation();
+    
+    isMatrixMode = false;
+    initRain();
+    updateRainAnimation();
+    
+    document.getElementById("avatarClicker").addEventListener("click", nextAvatar);
+    switchBgBtn.addEventListener("click", cycleBackground);
+    matrixSwitchBtn.addEventListener("click", switchEffectMode);
+    
+    bgElements[0].style.opacity = "1";
+    bgElements[1].style.opacity = "0";
+    bgElements[2].style.opacity = "0";
+    currentBgIndex = 0;
+    
+    initTabs();
+    
+    function unlockAudio() {
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('touchstart', unlockAudio);
+    }
+    document.addEventListener('click', unlockAudio);
+    document.addEventListener('touchstart', unlockAudio);
+    
+    function fixMobileGradient() {
+        const nickname = document.getElementById('nicknameText');
+        if (nickname) {
+            const currentText = nickname.innerText;
+            nickname.style.display = 'none';
+            nickname.offsetHeight;
+            nickname.style.display = '';
+            nickname.innerText = currentText;
+        }
+        
+        for (let i = 0; i < bgElements.length; i++) {
+            bgElements[i].style.opacity = i === currentBgIndex ? '1' : '0';
+        }
+    }
+    
+    if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        setTimeout(fixMobileGradient, 100);
+        setTimeout(fixMobileGradient, 500);
+        window.addEventListener('pageshow', fixMobileGradient);
+    }
+    
+    console.log("qq! Loaded");
+}
         
         window.addEventListener("DOMContentLoaded", init);
     </script>
