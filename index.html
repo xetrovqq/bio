@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>xetrov bio</title>
+    <link id="dynamicFavicon" rel="icon" type="image/png" href="favicon.png">
+    <style>
+        @font-face {
+            font-family: 'CustomFont';
+            src: url('font.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            cursor: url('normal.png'), auto;
+        }
+
+        a, button, .link-btn, .bg-switch-btn, 
+        .avatar-wrapper, .avatar-wrapper *,
+        .link-btn span, .link-btn img,
+        .bg-switch-btn img,
+        #avatarClicker, #avatarImg {
+            cursor: url('hand.png'), pointer !important;
+        }
+        
+        .link-btn span {
+            cursor: url('hand.png'), pointer !important;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #0a0c12;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'CustomFont', 'Inter', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+            padding: 16px;
+        }
+
+        #rainCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: opacity 0.4s ease-in-out;
+            z-index: -1;
+        }
+
+        #bg1 {
+            background-image: url('background.png');
+            opacity: 1;
+        }
+
+        #bg2 {
+            background-image: url('background2.gif');
+            opacity: 0;
+        }
+        
+        #bg3 {
+            background-image: url('background3.gif');
+            opacity: 0;
+        }
+
+        .glass-card {
+            position: relative;
+            z-index: 10;
+            background: rgba(20, 22, 32, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 2rem 2.5rem 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            margin: 1rem auto;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-wrapper {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 1rem;
+            transition: transform 0.2s ease;
+        }
+
+        .avatar-wrapper:hover {
+            transform: scale(1.02);
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s;
+        }
+
+        .nickname {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #FFFFFF 0%, #C0C4FF 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.4rem;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .description {
+            font-size: 0.9rem;
+            color: #e2e2f0;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.4rem 1rem;
+            border-radius: 60px;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(4px);
+            font-weight: 500;
+        }
+
+        .links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .link-btn {
+            background: rgba(30, 32, 44, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 10px 8px;
+            border-radius: 60px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #f0f0ff;
+            transition: transform 0.18s ease, background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .link-btn:hover {
+            transform: scale(1.04);
+            background: rgba(55, 58, 85, 0.9);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .link-icon {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            display: inline-block;
+            pointer-events: none;
+        }
+        
+        .link-btn span {
+            pointer-events: none;
+        }
+
+        .version-text {
+            margin-top: 24px;
+            font-size: 0.7rem;
+            color: rgba(200, 200, 230, 0.5);
+            letter-spacing: 0.5px;
+            font-weight: 400;
+            text-align: center;
+        }
+
+        .bg-switch-btn {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 20;
+            background: rgba(20, 22, 32, 0.75);
+            backdrop-filter: blur(8px);
+            border: none;
+            width: 54px;
+            height: 54px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, background 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0;
+        }
+        
+        .bg-switch-btn img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            display: block;
+            pointer-events: none;
+        }
+
+        .bg-switch-btn:hover {
+            transform: scale(1.08);
+            background: rgba(45, 48, 68, 0.9);
+        }
+
+        @media (max-width: 768px) and (orientation: portrait) {
+            body {
+                padding: 12px;
+                align-items: flex-start;
+                padding-top: 5vh;
+            }
+            
+            .glass-card {
+                width: 95%;
+                max-width: 420px;
+                padding: 1.2rem 1.2rem 1rem;
+                margin: 0 auto;
+                border-radius: 36px;
+            }
+            
+            .avatar-wrapper {
+                width: 85px;
+                height: 85px;
+                margin-bottom: 0.7rem;
+            }
+            
+            .nickname {
+                font-size: 1.5rem;
+                margin-bottom: 0.3rem;
+            }
+            
+            .description {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.9rem;
+                margin-bottom: 1rem;
+            }
+            
+            .links {
+                gap: 10px;
+                margin-top: 6px;
+            }
+            
+            .link-btn {
+                padding: 9px 6px;
+                font-size: 0.75rem;
+                gap: 6px;
+            }
+            
+            .link-icon {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .version-text {
+                margin-top: 18px;
+                font-size: 0.65rem;
+            }
+            
+            .bg-switch-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 48px;
+                height: 48px;
+            }
+            
+            .bg-switch-btn img {
+                width: 28px;
+                height: 28px;
+            }
+        }
+        
+        @media (max-width: 480px) and (orientation: portrait) {
+            body {
+                padding-top: 4vh;
+            }
+            
+            .glass-card {
+                padding: 1rem 1rem 0.9rem;
+                border-radius: 32px;
+            }
+            
+            .avatar-wrapper {
+                width: 75px;
+                height: 75px;
+            }
+            
+            .nickname {
+                font-size: 1.3rem;
+            }
+            
+            .description {
+                font-size: 0.7rem;
+                padding: 0.25rem 0.8rem;
+            }
+            
+            .links {
+                gap: 8px;
+                grid-template-columns: 1fr; 
+            }
+            
+            .link-btn {
+                padding: 10px 8px;
+                font-size: 0.8rem;
+            }
+            
+            .version-text {
+                margin-top: 16px;
+            }
+        }
+        
+        @media (max-width: 900px) and (orientation: landscape) {
+            body {
+                padding: 10px;
+                align-items: center;
+            }
+            
+            .glass-card {
+                padding: 1rem 1.5rem 0.8rem;
+                max-width: 85%;
+                margin: 0 auto;
+            }
+            
+            .avatar-wrapper {
+                width: 70px;
+                height: 70px;
+                margin-bottom: 0.5rem;
+            }
+            
+            .nickname {
+                font-size: 1.3rem;
+            }
+            
+            .description {
+                font-size: 0.75rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .links {
+                gap: 8px;
+            }
+            
+            .link-btn {
+                padding: 7px 5px;
+                font-size: 0.7rem;
+            }
+            
+            .bg-switch-btn {
+                bottom: 15px;
+                right: 15px;
+                width: 42px;
+                height: 42px;
+            }
+            
+            .bg-switch-btn img {
+                width: 24px;
+                height: 24px;
+            }
+        }
+        
+        @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+            .glass-card {
+                max-width: 480px;
+                padding: 1.6rem 2rem 1.2rem;
+            }
+            
+            .avatar-wrapper {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .nickname {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (hover: none) and (pointer: coarse) {
+            .link-btn:hover {
+                transform: none;
+            }
+            .avatar-wrapper:hover {
+                transform: none;
+            }
+            .bg-switch-btn:hover {
+                transform: none;
+            }
+            
+            .link-btn:active {
+                transform: scale(0.97);
+                background: rgba(55, 58, 85, 0.9);
+            }
+            .avatar-wrapper:active {
+                transform: scale(0.98);
+            }
+            .bg-switch-btn:active {
+                transform: scale(0.96);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg1" class="bg-layer"></div>
+    <div id="bg2" class="bg-layer"></div>
+    <div id="bg3" class="bg-layer"></div>
+    <canvas id="rainCanvas"></canvas>
+
+    <div class="glass-card">
+        <div class="avatar-wrapper" id="avatarClicker">
+            <img id="avatarImg" class="avatar" src="avatar.png" alt="avatar">
+        </div>
+        <div class="nickname" id="nicknameText">nickname</div>
+        <div class="description" id="descriptionText">Description</div>
+        <div class="links" id="linksContainer"></div>
+        <div class="version-text" id="versionText">1.0 (May 2026)</div>
+    </div>
+
+    <button class="bg-switch-btn" id="switchBgBtn">
+        <img src="refresh.png" alt="switch" id="switchIcon" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M23 4v6h-6%22/%3E%3Cpath d=%22M1 20v-6h6%22/%3E%3Cpath d=%22M3.51 9a9 9 0 0 1 14.85-3.36L23 10%22/%3E%3Cpath d=%22M20.49 15a9 9 0 0 1-14.85 3.36L1 14%22/%3E%3C/svg%3E'">
+    </button>
+
+    <script>
+        userProfile = {
+            nickname: "xetrov",
+            description: "Indie game developer from East Europe, rookie 2D/3D designer, Vortex Group owner.",
+            faviconUrl: "https://cdn-icons-png.flaticon.com/512/10337/10337609.png",
+            version: "Version 1.0 (May 2026)",
+            socialLinks: [
+                { text: "Telegram (Personal channel)", url: "https://t.me/xetrovqq", icon: "tg.png" },
+                { text: "Telegram (Vortex Group channel)", url: "https://t.me/vortexgroupdev", icon: "tg.png" },
+                { text: "Discord (Vortex Group server)", url: "https://discord.gg/nMcJV8JT9J", icon: "dc.png" },
+                { text: "Steam", url: "https://steamcommunity.com/id/xetrovqq", icon: "st.png" },
+                { text: "Twitch", url: "https://www.twitch.tv/xetrovqq", icon: "tw.png" },
+                { text: "itch.io", url: "https://xetrovqq.itch.io/", icon: "ii.png" },
+                { text: "GameJolt", url: "https://gamejolt.com/@xetrovqq/games", icon: "gj.png" },
+                { text: "Matrix community (Vortex Group)", url: "https://matrix.to/#/#vortexgroup:matrix.org", icon: "el.png" }
+            ]
+        };
+
+        const rainColors = [
+            "rgba(100, 150, 255, 0.65)",
+            "rgba(180, 100, 255, 0.65)",
+            "rgba(255, 80, 100, 0.65)"
+        ];
+
+        let currentRainColorIndex = 0;
+        
+        const rainConfig = {
+            count: 200,
+            color: rainColors[0],
+            sizeMin: 4.2,
+            sizeMax: 8.5,
+            speedMin: 1.4,
+            speedMax: 4.5,
+            width: 1.2
+        };
+
+        const titleAnimConfig = {
+            speed: 160,
+        };
+
+        const avatarArray = [
+            "avatar.png",
+			"avatar1.png",
+            "avatar2.png",
+            "avatar3.png",
+            "avatar4.png"
+        ];
+
+        let currentBgIndex = 0;
+        const bgElements = [
+            document.getElementById("bg1"),
+            document.getElementById("bg2"),
+            document.getElementById("bg3")
+        ];
+        
+        let audioCtx = null;
+        
+        function playClickSound() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.frequency.value = 880;
+                gainNode.gain.value = 0.15;
+                oscillator.type = "sine";
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
+                oscillator.stop(audioCtx.currentTime + 0.2);
+            } catch(e) { console.log("audio error", e); }
+        }
+        
+        function playAvatarSound() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.frequency.value = 660;
+                gainNode.gain.value = 0.2;
+                oscillator.type = "triangle";
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.15);
+                oscillator.stop(audioCtx.currentTime + 0.15);
+            } catch(e) {}
+        }
+
+        const nicknameEl = document.getElementById("nicknameText");
+        const descriptionEl = document.getElementById("descriptionText");
+        const linksContainer = document.getElementById("linksContainer");
+        const avatarImg = document.getElementById("avatarImg");
+        const switchBtn = document.getElementById("switchBgBtn");
+        const versionEl = document.getElementById("versionText");
+
+        let currentAvatarIndex = 0;
+        let titleInterval = null;
+        let titleNick = "";
+        
+        let canvas, ctx, rainDrops = [], animationId = null, canvasWidth, canvasHeight;
+        
+        function getBracketedNick() {
+            return `[${userProfile.nickname}]`;
+        }
+
+        function loadProfileData() {
+            nicknameEl.innerText = userProfile.nickname;
+            descriptionEl.innerText = userProfile.description;
+            versionEl.innerText = userProfile.version;
+            titleNick = getBracketedNick();
+            document.title = titleNick;
+            
+             linksContainer.innerHTML = "";
+    userProfile.socialLinks.forEach(link => {
+        const a = document.createElement("a");
+        a.href = link.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.className = "link-btn";
+        const iconImg = document.createElement("img");
+        iconImg.src = link.icon;
+        iconImg.alt = "icon";
+        iconImg.className = "link-icon";
+        iconImg.onerror = function() {
+            this.style.display = "none";
+        };
+        const spanText = document.createElement("span");
+        spanText.innerText = link.text;
+        a.appendChild(iconImg);
+        a.appendChild(spanText);
+        
+        a.addEventListener("click", (e) => {
+            playClickSound();
+        });
+        
+        linksContainer.appendChild(a);
+    });
+}
+        
+        function initAvatar() {
+            if (avatarArray.length) {
+                avatarImg.src = avatarArray[0];
+                currentAvatarIndex = 0;
+            }
+        }
+        
+        function nextAvatar() {
+            if (!avatarArray.length) return;
+            currentAvatarIndex = (currentAvatarIndex + 1) % avatarArray.length;
+            avatarImg.src = avatarArray[currentAvatarIndex];
+            playAvatarSound();
+        }
+        
+        function updateRainColorForBackground(bgIndex) {
+            if (bgIndex >= 0 && bgIndex < rainColors.length) {
+                rainConfig.color = rainColors[bgIndex];
+                currentRainColorIndex = bgIndex;
+            }
+        }
+        
+        function cycleBackground() {
+            currentBgIndex = (currentBgIndex + 1) % bgElements.length;
+            for (let i = 0; i < bgElements.length; i++) {
+                if (i === currentBgIndex) {
+                    bgElements[i].style.opacity = "1";
+                } else {
+                    bgElements[i].style.opacity = "0";
+                }
+            }
+            updateRainColorForBackground(currentBgIndex);
+            playClickSound();
+        }
+        
+        function ensureBackgroundsWork() {
+            for (let i = 0; i < bgElements.length; i++) {
+                let bgEl = bgElements[i];
+                let currentBgImage = getComputedStyle(bgEl).backgroundImage;
+                if (currentBgImage === 'none' || currentBgImage === '') {
+                    if (i === 0) bgEl.style.backgroundImage = "url('background.png')";
+                    else if (i === 1) bgEl.style.backgroundImage = "url('background2.gif')";
+                    else if (i === 2) bgEl.style.backgroundImage = "url('background3.gif')";
+                }
+            }
+        }
+        
+        function startTitleAnimation() {
+            if (titleInterval) clearInterval(titleInterval);
+            const fullBracketed = getBracketedNick();
+            const len = fullBracketed.length;
+            if (len === 0) return;
+            
+            let step = 0;
+            let direction = 1;
+            
+            function updateTitle() {
+                if (direction === 1) {
+                    if (step <= len) {
+                        const displayPart = fullBracketed.substring(0, step);
+                        document.title = displayPart;
+                        step++;
+                        if (step > len) {
+                            step = len - 1;
+                            direction = -1;
+                        }
+                    }
+                } else {
+                    if (step >= 0) {
+                        const displayPart = fullBracketed.substring(0, step);
+                        document.title = displayPart;
+                        step--;
+                        if (step < 0) {
+                            step = 1;
+                            direction = 1;
+                        }
+                    }
+                }
+            }
+            titleInterval = setInterval(updateTitle, titleAnimConfig.speed);
+        }
+        
+        canvas = document.getElementById("rainCanvas");
+        ctx = canvas.getContext("2d");
+        
+        function resizeCanvas() {
+            canvasWidth = window.innerWidth;
+            canvasHeight = window.innerHeight;
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+        }
+        
+        class RainDrop {
+            constructor() {
+                this.x = Math.random() * canvasWidth;
+                this.y = Math.random() * canvasHeight;
+                this.length = rainConfig.sizeMin + Math.random() * (rainConfig.sizeMax - rainConfig.sizeMin);
+                this.speed = rainConfig.speedMin + Math.random() * (rainConfig.speedMax - rainConfig.speedMin);
+                this.opacity = 0.4 + Math.random() * 0.6;
+            }
+            update() {
+                this.y += this.speed;
+                if (this.y > canvasHeight) {
+                    this.y = -this.length;
+                    this.x = Math.random() * canvasWidth;
+                }
+            }
+            draw() {
+                if (!ctx) return;
+                ctx.beginPath();
+                let strokeColor = rainConfig.color;
+                if (strokeColor.startsWith("rgba")) {
+                    let alphaVal = this.opacity * 0.85;
+                    strokeColor = strokeColor.replace(/[\d\.]+\)$/g, `${alphaVal})`);
+                    ctx.strokeStyle = strokeColor;
+                } else {
+                    ctx.globalAlpha = this.opacity * 0.8;
+                    ctx.strokeStyle = strokeColor;
+                }
+                ctx.lineWidth = rainConfig.width;
+                ctx.lineCap = "round";
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x, this.y + this.length);
+                ctx.stroke();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+        
+        function initRain() {
+            rainDrops = [];
+            for (let i = 0; i < rainConfig.count; i++) {
+                rainDrops.push(new RainDrop());
+            }
+        }
+        
+        function drawRain() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            for (let drop of rainDrops) drop.draw();
+        }
+        
+        function updateRain() {
+            for (let drop of rainDrops) drop.update();
+            drawRain();
+            animationId = requestAnimationFrame(updateRain);
+        }
+        
+        function startRain() {
+            if (animationId) cancelAnimationFrame(animationId);
+            resizeCanvas();
+            initRain();
+            updateRain();
+        }
+        
+        window.addEventListener("resize", () => {
+            resizeCanvas();
+            initRain();
+        });
+        
+        function init() {
+            loadProfileData();
+            initAvatar();
+            startTitleAnimation();
+            startRain();
+            
+            const avatarWrapper = document.getElementById("avatarClicker");
+            avatarWrapper.addEventListener("click", nextAvatar);
+            switchBtn.addEventListener("click", cycleBackground);
+            
+            for (let i = 0; i < bgElements.length; i++) {
+                if (i === 0) bgElements[i].style.opacity = "1";
+                else bgElements[i].style.opacity = "0";
+            }
+            currentBgIndex = 0;
+            updateRainColorForBackground(0);
+            
+            ensureBackgroundsWork();
+            setInterval(ensureBackgroundsWork, 1500);
+            
+            function unlockAudio() {
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                document.removeEventListener('click', unlockAudio);
+                document.removeEventListener('touchstart', unlockAudio);
+            }
+            document.addEventListener('click', unlockAudio);
+            document.addEventListener('touchstart', unlockAudio);
+            
+            console.log("qq! Loaded");
+        }
+        
+        window.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+</html>
