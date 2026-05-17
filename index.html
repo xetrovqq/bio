@@ -293,8 +293,18 @@
         }
         .bg-switch-btn:hover, .matrix-switch-btn:hover { transform: scale(1.08); }
 
-        @media (max-width: 768px) {
-            .glass-card { padding: 1.2rem 1.2rem 1rem; }
+
+        @media (max-width: 768px) and (hover: none) and (pointer: coarse) {
+            body {
+                padding: 12px;
+                align-items: flex-start;
+                padding-top: 5vh;
+            }
+            .glass-card {
+                padding: 1.2rem 1.2rem 1rem;
+                border-radius: 36px;
+                background: rgba(20, 22, 32, 0.85);
+            }
             .avatar-wrapper { width: 85px; height: 85px; }
             .nickname { font-size: 1.5rem; }
             .description { font-size: 0.8rem; }
@@ -304,7 +314,7 @@
             .matrix-switch-btn { left: 20px; }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 480px) and (hover: none) and (pointer: coarse) {
             .links, .projects-grid { grid-template-columns: 1fr; }
             .avatar-wrapper { width: 75px; height: 75px; }
         }
@@ -375,6 +385,33 @@
         }
         .dialog-btn:hover { transform: scale(1.05); background: rgba(255, 255, 255, 0.3); }
         .dialog-btn:active { transform: scale(0.98); }
+		
+@media (min-width: 1200px) {
+    .glass-card {
+        background: rgba(20, 22, 32, 0.7) !important;
+        backdrop-filter: blur(12px) !important;
+    }
+    .nickname {
+        background: linear-gradient(135deg, #FFFFFF 0%, #C0C4FF 100%) !important;
+        background-clip: text !important;
+        -webkit-background-clip: text !important;
+        color: transparent !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+}
+
+@media (min-width: 1001px) {
+    .nickname {
+        background: linear-gradient(135deg, #FFFFFF 0%, #C0C4FF 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+    }
+    .glass-card {
+        background: rgba(20, 22, 32, 0.7);
+        backdrop-filter: blur(12px);
+    }
+}
     </style>
 </head>
 <body>
@@ -401,7 +438,7 @@
     <div id="projects-tab" class="tab-content hidden">
         <div class="projects-grid" id="projectsContainer"></div>
     </div>
-    <div class="version-text" id="versionText">1.2 (May 2026)</div>
+    <div class="version-text" id="versionText">1.3 (May 2026)</div>
 </div>
 
 <button class="bg-switch-btn" id="switchBgBtn">
@@ -430,7 +467,7 @@
 const      userProfile = {
             nickname: "xetrov",
             description: "Indie game developer from East Europe, rookie 2D/3D designer, Vortex Group owner.",
-            version: "Version 1.2 (May 2026)",
+            version: "Version 1.3 (May 2026)",
             socialLinks: [
                 { text: "Telegram (Personal channel)", url: "https://t.me/xetrovqq", icon: "tg.png" },
                 { text: "Telegram (Vortex Group channel)", url: "https://t.me/vortexgroupdev", icon: "tg.png" },
@@ -458,7 +495,7 @@ const      userProfile = {
     speedMin: 0.8,            
     speedMax: 2.2,             
     color: "#0f0",             
-    bgColor: "rgba(0,0,0,0.05)", 
+    bgColor: "rgba(0,0,0,0.05)",  
     fadeHeight: 0.6,         
     maxFallHeight: 0.45,     
     minFallHeight: 0.25,      
@@ -470,54 +507,64 @@ const      userProfile = {
 
 const rainColors = ["rgba(100, 150, 255, 0.65)", "rgba(180, 100, 255, 0.65)", "rgba(255, 80, 100, 0.65)"];
 
+const isMobileDevice = () => {
+    const mobileUA = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone|Opera Mini|IEMobile/i.test(navigator.userAgent);
+    
+    const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    const isSmallPhysicalSize = window.matchMedia("(max-width: 768px) and (max-resolution: 2dppx)").matches;
+    
+    const isWideScreen = window.innerWidth > 1000;
+    
+    const result = (mobileUA || (hasTouchScreen && window.innerWidth <= 900)) && !isWideScreen;
+    
+    return result;
+};
+
+let cachedIsMobile = isMobileDevice();
+
+function updateMobileDetection() {
+    const newIsMobile = isMobileDevice();
+    if (newIsMobile !== cachedIsMobile) {
+        cachedIsMobile = newIsMobile;
+        if (cachedIsMobile) {
+            document.body.classList.add('mobile-mode');
+        } else {
+            document.body.classList.remove('mobile-mode');
+        }
+    }
+}
+
+window.addEventListener('resize', () => {
+    setTimeout(updateMobileDetection, 100);
+});
+
 let currentBgIndex = 0;
 let isMatrixMode = false;
 let rainDrops = [], matrixDrops = [], animationId = null;
 let canvas, ctx, canvasWidth, canvasHeight;
 let audioCtx = null;
+let audioUnlocked = false;
 let currentAvatarIndex = 0;
-const avatarArray = ["avatar.png", "avatar1.png", "avatar2.png", "avatar3.png", "avatar4.png"];
+const avatarArray = ["avatar.png", "avatar2.png", "avatar3.png", "avatar4.png"];
 let titleInterval = null;
 
 const bgElements = [document.getElementById("bg1"), document.getElementById("bg2"), document.getElementById("bg3")];
 
-let audioUnlocked = false;
-
 function unlockAudio() {
     if (audioUnlocked) return;
     audioUnlocked = true;
-    
     try {
         const testAudio = new Audio();
         testAudio.volume = 0;
-        testAudio.play().then(() => {
-            testAudio.pause();
-        }).catch(() => {});
+        testAudio.play().then(() => testAudio.pause()).catch(() => {});
     } catch(e) {}
-    
-    if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-    }
-}
-
-function playClickSound() {
-    unlockAudio();
-    try {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume().then(() => {
-                actuallyPlayClick();
-            }).catch(() => {});
-        } else {
-            actuallyPlayClick();
-        }
-    } catch(e) { console.log("Sound error:", e); }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 }
 
 function actuallyPlayClick() {
     try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
@@ -531,24 +578,16 @@ function actuallyPlayClick() {
     } catch(e) {}
 }
 
-function playTabSound() {
+function playClickSound() {
     unlockAudio();
-    try {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume().then(() => {
-                actuallyPlayTab();
-            }).catch(() => {});
-        } else {
-            actuallyPlayTab();
-        }
-    } catch(e) {}
+    if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    if (audioCtx.state === 'suspended') { audioCtx.resume().then(() => actuallyPlayClick()).catch(() => {}); }
+    else { actuallyPlayClick(); }
 }
 
 function actuallyPlayTab() {
     try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
@@ -562,21 +601,20 @@ function actuallyPlayTab() {
     } catch(e) {}
 }
 
+function playTabSound() {
+    unlockAudio();
+    if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    if (audioCtx.state === 'suspended') { audioCtx.resume().then(() => actuallyPlayTab()).catch(() => {}); }
+    else { actuallyPlayTab(); }
+}
+
 function playWarnSound() {
     unlockAudio();
     try {
         const audio = new Audio('warn.wav');
         audio.volume = 0.4;
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(() => {
-                document.addEventListener('click', function playOnClick() {
-                    audio.play().catch(() => {});
-                    document.removeEventListener('click', playOnClick);
-                }, { once: true });
-            });
-        }
-    } catch(e) { console.log("Warn sound error:", e); }
+        audio.play().catch(() => {});
+    } catch(e) {}
 }
 
 function loadProfileData() {
@@ -832,14 +870,15 @@ function resizeCanvas() {
 }
 
 function showMobileWarning() {
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(navigator.userAgent);
-    const hasShown = sessionStorage.getItem('warningShown');
-    if (isMobile && !hasShown) {
-        setTimeout(() => {
-            playWarnSound();
-            document.getElementById('warningDialog').classList.add('active');
-            sessionStorage.setItem('warningShown', 'true');
-        }, 500);
+    if (isMobileDevice()) {
+        const hasShown = sessionStorage.getItem('warningShown');
+        if (!hasShown) {
+            setTimeout(() => {
+                playWarnSound();
+                document.getElementById('warningDialog').classList.add('active');
+                sessionStorage.setItem('warningShown', 'true');
+            }, 500);
+        }
     }
 }
 
@@ -874,18 +913,167 @@ function init() {
     });
     showMobileWarning();
     
-    function unlockAudio() {
-        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        document.removeEventListener('click', unlockAudio);
-        document.removeEventListener('touchstart', unlockAudio);
+    function unlockOnFirstTouch() {
+        unlockAudio();
+        document.removeEventListener('click', unlockOnFirstTouch);
+        document.removeEventListener('touchstart', unlockOnFirstTouch);
     }
-    document.addEventListener('click', unlockAudio);
-    document.addEventListener('touchstart', unlockAudio);
+    document.addEventListener('click', unlockOnFirstTouch);
+    document.addEventListener('touchstart', unlockOnFirstTouch);
+	
+	updateMobileDetection();
     
+
+setTimeout(checkDisplayIssues, 800);
+setTimeout(checkDisplayIssues, 2000);
+	
     console.log("qq! Loaded");
 }
 
 window.addEventListener("DOMContentLoaded", init);
 </script>
+
+<div id="pcWarningMessage" class="pc-warning">
+    <div class="pc-warning-icon">
+        <img src="warn.png" alt="⚠️" id="pcWarnIcon" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2236%22 height=%2236%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23ffaa44%22 stroke-width=%222%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%2210%22/%3E%3Cline x1=%2212%22 y1=%228%22 x2=%2212%22 y2=%2212%22/%3E%3Ccircle cx=%2212%22 cy=%2216%22 r=%221%22/%3E%3C/svg%3E'">
+    </div>
+    <div class="pc-warning-text">
+        If you see black background or black nickname - <strong>then reload page or change browser.</strong> 
+    </div>
+    <button class="pc-warning-close" id="pcWarningClose">✕</button>
+</div>
+
+<style>
+.pc-warning {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(16px);
+    border-radius: 60px;
+    padding: 10px 16px 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid rgba(255, 200, 100, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    transition: bottom 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    font-family: 'CustomFont', 'Inter', sans-serif;
+    width: auto;
+    max-width: 90vw;
+    white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+    .pc-warning {
+        white-space: normal;
+        max-width: 85vw;
+        padding: 8px 14px 8px 10px;
+    }
+    .pc-warning-text {
+        font-size: 0.75rem;
+    }
+}
+
+.pc-warning.show {
+    bottom: 20px;
+}
+
+.pc-warning-icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 100, 50, 0.15);
+    border-radius: 50%;
+}
+
+.pc-warning-icon img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    display: block;
+}
+
+.pc-warning-text {
+    flex: 1;
+    font-size: 0.85rem;
+    color: #ffe0b3;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+.pc-warning-text strong {
+    color: #ffaa44;
+    font-weight: 800;
+}
+
+.pc-warning-close {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: url('hand.png'), pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.pc-warning-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+@media (max-width: 768px) and (hover: none) {
+    .pc-warning {
+        display: none;
+    }
+}
+</style>
+
+<script>
+(function() {
+    function isDesktopDevice() {
+        const mobileUA = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone|Opera Mini|IEMobile/i.test(navigator.userAgent);
+        const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const isSmallScreen = window.innerWidth <= 900;
+        
+        return !mobileUA && (!hasTouchScreen || !isSmallScreen);
+    }
+    
+    const pcWarningShown = sessionStorage.getItem('pcWarningShown');
+    
+    if (isDesktopDevice() && !pcWarningShown) {
+        setTimeout(() => {
+            const warningEl = document.getElementById('pcWarningMessage');
+            if (warningEl) {
+                warningEl.classList.add('show');
+                sessionStorage.setItem('pcWarningShown', 'true');
+                
+                setTimeout(() => {
+                    if (warningEl) warningEl.classList.remove('show');
+                }, 10000);
+            }
+        }, 1500);
+    }
+
+    const closeBtn = document.getElementById('pcWarningClose');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            const warningEl = document.getElementById('pcWarningMessage');
+            if (warningEl) warningEl.classList.remove('show');
+        });
+    }
+})();
+</script>
+
 </body>
 </html>
