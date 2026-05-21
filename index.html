@@ -499,6 +499,68 @@
 #themeIcon {
     cursor: url('hand.png'), pointer !important;
 }
+
+.video-loading {
+    position: fixed;
+    bottom: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10002;
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(20px);
+    border-radius: 60px;
+    padding: 14px 24px 14px 18px;  
+    display: flex;
+    align-items: center;
+    gap: 16px;  
+    border: 1px solid rgba(100, 200, 255, 0.6);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    transition: bottom 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    font-family: 'CustomFont', 'Inter', sans-serif;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.video-loading.show {
+    bottom: 20px;
+}
+
+.video-loading-icon {
+    width: 32px;  
+    height: 32px;
+    object-fit: contain;
+    animation: spin 1s linear infinite;
+}
+
+.video-loading-text {
+    font-size: 1rem;  
+    color: #aaffdd;
+}
+
+.video-loading-text strong {
+    color: #44ffaa;
+    font-size: 1.05rem;
+}
+
+@media (max-width: 700px) {
+    .video-loading {
+        white-space: normal;
+        max-width: 85vw;
+        padding: 10px 18px 10px 14px;
+    }
+    .video-loading-icon {
+        width: 28px;
+        height: 28px;
+    }
+    .video-loading-text {
+        font-size: 0.9rem;
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
     </style>
 </head>
 <body>
@@ -771,10 +833,75 @@ function nextAvatar() {
     playClickSound();
 }
 
+let videoPreloadPromise = null;
+let isVideoLoading = false;
+
+function preloadVideo() {
+    if (videoPreloadPromise) return videoPreloadPromise;
+    
+    isVideoLoading = true;
+    showVideoLoadingMessage(true);
+    
+    videoPreloadPromise = new Promise((resolve, reject) => {
+        const tempVideo = document.createElement('video');
+        tempVideo.preload = 'auto';
+        tempVideo.src = 'background4.mp4';
+        tempVideo.muted = true;
+        
+        tempVideo.oncanplaythrough = () => {
+            console.log("Video preloaded successfully");
+            isVideoLoading = false;
+            showVideoLoadingMessage(false);
+            resolve();
+        };
+        
+        tempVideo.onerror = () => {
+            console.log("Video preload failed");
+            isVideoLoading = false;
+            showVideoLoadingMessage(false);
+            reject();
+        };
+        
+        tempVideo.load();
+    });
+    
+    return videoPreloadPromise;
+}
+
+let videoLoadingTimeout = null;
+
+function showVideoLoadingMessage(show, duration = 8000) { 
+    const msg = document.getElementById('videoLoadingMessage');
+    if (!msg) return;
+    
+    if (videoLoadingTimeout) clearTimeout(videoLoadingTimeout);
+    
+    if (show) {
+        msg.classList.add('show');
+        
+        videoLoadingTimeout = setTimeout(() => {
+            msg.classList.remove('show');
+            videoLoadingTimeout = null;
+        }, duration);
+    } else {
+        msg.classList.remove('show');
+        if (videoLoadingTimeout) {
+            clearTimeout(videoLoadingTimeout);
+            videoLoadingTimeout = null;
+        }
+    }
+}
+
 function cycleBackground() {
+    const isNextVideo = (currentBgIndex + 1) % bgElements.length === 3;
+    
     if (bgElements[currentBgIndex] && bgElements[currentBgIndex].isVideo) {
         bgVideo.pause();
         bgVideo.currentTime = 0;
+    }
+    
+    if (isNextVideo && !videoPreloadPromise) {
+        preloadVideo();
     }
     
     currentBgIndex = (currentBgIndex + 1) % bgElements.length;
@@ -786,11 +913,25 @@ function cycleBackground() {
         if (bg.isVideo) {
             bg.element.style.opacity = isActive ? "1" : "0";
             if (isActive) {
-                bgVideo.src = "background4.mp4";
-                bgVideo.load();
-                bgVideo.muted = false;
-                bgVideo.play().catch(e => console.log("Video autoplay error:", e));
-            }
+    showVideoLoadingMessage(true, 8000); 
+    const startVideo = () => {
+        bgVideo.src = "background4.mp4";
+        bgVideo.load();
+        bgVideo.muted = false;
+        bgVideo.play().then(() => {
+            setTimeout(() => showVideoLoadingMessage(false), 1000);
+        }).catch(e => {
+            console.log("Video play error:", e);
+            setTimeout(() => showVideoLoadingMessage(false), 1500);
+        });
+    };
+    
+    if (videoPreloadPromise) {
+        videoPreloadPromise.then(startVideo).catch(startVideo);
+    } else {
+        startVideo();
+    }
+}
         } else {
             bg.style.opacity = isActive ? "1" : "0";
         }
@@ -798,7 +939,7 @@ function cycleBackground() {
     
     if (!isMatrixMode && window.rainConfig) {
         if (currentBgIndex === 3) {
-            window.rainConfig.color = "rgba(74, 74, 74, 0.8)"; 
+            window.rainConfig.color = "rgba(200, 200, 100, 0.65)";
         } else {
             window.rainConfig.color = rainColors[currentBgIndex];
         }
@@ -1089,6 +1230,10 @@ setTimeout(checkDisplayIssues, 2000);
     console.log("qq! Loaded");
 }
 
+setTimeout(() => {
+    preloadVideo().catch(() => {});
+}, 3000);
+
 window.addEventListener("DOMContentLoaded", init);
 </script>
 
@@ -1100,6 +1245,15 @@ window.addEventListener("DOMContentLoaded", init);
         If you see black background or black nickname - <strong>then reload page or change browser.</strong> 
     </div>
     <button class="pc-warning-close" id="pcWarningClose">✕</button>
+</div>
+
+<div id="videoLoadingMessage" class="video-loading">
+    <img class="video-loading-icon" src="https://cdn-icons-png.flaticon.com/256/5690/5690573.png" alt="loading" 
+         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'video-loading-icon\'>🎬</div>'">
+    <div class="video-loading-text">
+        <strong>Loading video background...</strong><br>
+        Please, wait for the full load
+    </div>
 </div>
 
 <style>
@@ -1208,21 +1362,21 @@ window.addEventListener("DOMContentLoaded", init);
         return !mobileUA && (!hasTouchScreen || !isSmallScreen);
     }
     
-    const pcWarningShown = sessionStorage.getItem('pcWarningShown');
-    
-    if (isDesktopDevice() && !pcWarningShown) {
-        setTimeout(() => {
-            const warningEl = document.getElementById('pcWarningMessage');
-            if (warningEl) {
-                warningEl.classList.add('show');
-                sessionStorage.setItem('pcWarningShown', 'true');
-                
-                setTimeout(() => {
-                    if (warningEl) warningEl.classList.remove('show');
-                }, 10000);
-            }
-        }, 1500);
-    }
+const pcWarningShown = sessionStorage.getItem('pcWarningShown');
+
+if (isDesktopDevice() && !pcWarningShown) {
+    setTimeout(() => {
+        const warningEl = document.getElementById('pcWarningMessage');
+        if (warningEl) {
+            warningEl.classList.add('show');
+            sessionStorage.setItem('pcWarningShown', 'true');
+            
+            setTimeout(() => {
+                if (warningEl) warningEl.classList.remove('show');
+            }, 10000);  /
+        }
+    }, 1500);
+}
 
     const closeBtn = document.getElementById('pcWarningClose');
     if (closeBtn) {
